@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spectre Attack Demonstration - Microarchitectural Security</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        section {
+            background: white;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        h2 {
+            color: #4a5568;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .analogy-box {
+            background: #f7fafc;
+            border-left: 4px solid #4299e1;
+            padding: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .pdf-container {
+            width: 100%;
+            height: 600px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .screenshot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .screenshot {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 0.5rem;
+            background: white;
+        }
+        
+        .screenshot img {
+            width: 100%;
+            height: auto;
+            border-radius: 4px;
+        }
+        
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .team-member {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .video-placeholder {
+            background: #f8f9fa;
+            border: 2px dashed #667eea;
+            border-radius: 8px;
+            padding: 3rem;
+            text-align: center;
+            color: #718096;
+        }
+        
+        .code-snippet {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: #718096;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Spectre Attack Demonstration</h1>
+        <p class="subtitle">Microarchitectural Security Analysis - Bounds Check Bypass (Variant 1)</p>
+        <p class="subtitle">Muhammad Faraz Ansari - m.ansari.29201@khi.iba.edu.pk</p>
+    </header>
+
+    <section id="summary">
+        <h2>🎯 Non-Technical Summary</h2>
+        <div class="analogy-box">
+            <h3>🧑‍🍳 The Over-Eager Chef Analogy</h3>
+            <p>Imagine a chef who tries to save time by guessing what ingredients you'll need next. He starts preparing them before you even finish your order. If his guess is wrong, he discards the prepped ingredients, but the bowls and utensils he used remain warm and rearranged.</p>
+            
+            <p><strong>Spectre works exactly like this:</strong> We trick the computer's "chef" (the CPU) into briefly accessing secret information during its guessing game. Even though it throws away the results, we can detect which "bowls" it used by measuring how warm they are - revealing the secret ingredients!</p>
+            
+            <p>This attack doesn't break any locks or passwords - it simply observes the leftover clues from the computer's speed optimization techniques.</p>
+        </div>
+    </section>
+
+    <section id="technical-explanation">
+        <h2>🔬 Technical Overview</h2>
+        <div class="analogy-box">
+            <h3>Library Analogy</h3>
+            <p>Consider a librarian who keeps recently used books on her desk. If you want to know which book someone else recently read, you can time how long it takes to retrieve various books. The one that appears instantly from her desk must have been recently accessed, revealing the other person's reading material without directly observing them.</p>
+        </div>
+        
+        <h3>Core Vulnerability</h3>
+        <p>The victim function contains the security boundary that gets bypassed:</p>
+        <div class="code-snippet">
+void victim_function(size_t x) {
+    if (x < array1_size) {
+        temp &= array2[array1[x] * 512];
+    }
+}
+        </div>
+        <p>During speculative execution, the CPU doesn't wait for the bounds check to complete, temporarily accessing unauthorized memory.</p>
+    </section>
+
+    <section id="demo-results">
+        <h2>📊 Attack Demonstration Results</h2>
+        <div class="screenshot-grid">
+            <div class="screenshot">
+                <img src="screenshots/figure5-terminal-output.png" alt="Successful Spectre attack output">
+                <p><strong>Figure 5:</strong> Successful Spectre attack execution - character-by-character leakage of secret string</p>
+            </div>
+            <div class="screenshot">
+                <img src="screenshots/figure4-cache-timing.png" alt="Cache timing measurement code">
+                <p><strong>Figure 4:</strong> Cache timing measurement implementation - core detection mechanism</p>
+            </div>
+            <div class="screenshot">
+                <img src="screenshots/figure1-environment.png" alt="Kali Linux environment">
+                <p><strong>Figure 1:</strong> Kali Linux experimental environment verification</p>
+            </div>
+            <div class="screenshot">
+                <img src="screenshots/figure2-repo-setup.png" alt="Spectre PoC repository setup">
+                <p><strong>Figure 2:</strong> Spectre PoC repository setup and cloning process</p>
+            </div>
+            <div class="screenshot">
+                <img src="screenshots/figure3-compilation.png" alt="Code compilation process">
+                <p><strong>Figure 3:</strong> Code compilation process with GCC</p>
+            </div>
+            <div class="screenshot">
+                <img src="screenshots/figure6-close-up.png" alt="Secret reconstruction close-up">
+                <p><strong>Figure 6:</strong> Secret reconstruction close-up showing confidence scores</p>
+            </div>
+        </div>
+        
+        <div class="analogy-box" style="margin-top: 2rem;">
+            <h4>📈 Results Interpretation</h4>
+            <p><strong>Confidence Scores:</strong> Each score represents how many times our timing measurements detected that character in the CPU cache. Higher scores (7-11) indicate clear cache hits, while lower scores (2-3) show weaker signals affected by system noise.</p>
+            <p><strong>Success Metrics:</strong> 100% secret recovery of 40-byte string with average confidence score of 4.2/10 across all characters.</p>
+        </div>
+    </section>
+
+    <section id="report">
+        <h2>📚 Academic Tutorial Report</h2>
+        <p><strong>Complete Technical Analysis (IEEE Format) - 9 Page Research Paper</strong></p>
+        <div class="pdf-container">
+            <embed src="spectre-report.pdf" type="application/pdf" width="100%" height="100%">
+        </div>
+        <p style="margin-top: 1rem; text-align: center;">
+            <a href="spectre-report.pdf" download style="color: #667eea; text-decoration: none;">📥 Download Full PDF Report</a>
+        </p>
+    </section>
+
+    <section id="demo">
+        <h2>🎥 Attack Simulation Video</h2>
+        <p><strong>Live Demonstration (Coming Soon)</strong></p>
+        <div class="video-placeholder">
+            <h3>Video Demonstration</h3>
+            <p>Attack simulation video will be embedded here once completed.</p>
+            <p>This section will feature a 5-10 minute narrated demonstration of the Spectre attack execution in Kali Linux, showing real-time character leakage and technical explanation.</p>
+        </div>
+    </section>
+
+    <section id="team">
+        <h2>👥 Researcher</h2>
+        <div class="team-grid">
+            <div class="team-member">
+                <h3>Muhammad Faraz Ansari</h3>
+                <p><strong>Role:</strong> Lead Researcher & Security Analyst</p>
+                <p><strong>Contributions:</strong> Spectre attack implementation, Kali Linux environment setup, technical analysis, academic report writing, proof-of-concept development</p>
+                <p><strong>Contact:</strong> m.ansari.29201@khi.iba.edu.pk</p>
+                <p><strong>Institution:</strong> Institute of Business Administration, Karachi</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>Microarchitectural Security Assignment | Controlled Lab Environment | Educational Purpose Only</p>
+        <p>© 2024 Cybersecurity Research - IBA Karachi</p>
+    </footer>
+</body>
+</html>
